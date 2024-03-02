@@ -14,6 +14,6 @@ jobs:
     uses: majksa-actions/workflows/.github/workflows/create-deployment-manifest.yml@v1
     strategy:
       matrix:
-        environment: ["prod"]
+        environment: ["prod", "dev"]
     with:
       environment: ${{ matrix.environment }}
