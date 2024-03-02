@@ -39,14 +39,14 @@ jobs:
       - name: Config Server
         uses: majksa-actions/deployment-config@v1
         with:
-          source: ${{ env.MAIN_BRANCH }}
+          source: ${{ env.MAIN_BRANCH }}/input
           target: ${{ env.ENV_BRANCH }}
           environment: ${{ matrix.environment }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          title: format('Update {0} environment branch', steps.precheck.outputs.base_ref_name)
+          title: ${{ format('Update {0} environment branch', steps.precheck.outputs.base_ref_name) }}
           commit-message: "chore: update environment branch data"
           body: "Updated manifest file"
           base: ${{ steps.precheck.outputs.base_ref_name }}
