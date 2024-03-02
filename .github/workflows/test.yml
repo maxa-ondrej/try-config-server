@@ -18,14 +18,12 @@ jobs:
       ENV_BRANCH: env
     strategy:
       matrix:
-        environments: ["prod"]
+        environment: ["prod"]
     steps:
       - name: Precheck
         id: precheck
         run: |
-          echo "base_ref_name=env/${INPUT_ENV}" >> $GITHUB_OUTPUT
-        env:
-          INPUT_ENV: ${{ matrix.environment }}
+          echo "base_ref_name=env/${{ matrix.environment }}" >> $GITHUB_OUTPUT
 
       - name: Checkout ${{ env.MAIN_BRANCH }}
         uses: actions/checkout@v4
