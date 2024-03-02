@@ -13,23 +13,46 @@ jobs:
       contents: write
       pull-requests: write
     timeout-minutes: 5
+    env:
+      MAIN_BRANCH: main
+      ENV_BRANCH: env
+    strategy:
+      matrix:
+        environments: ["prod"]
     steps:
-      - name: Checkout
+      - name: Precheck
+        id: precheck
+        run: |
+          echo "base_ref_name=env/${INPUT_ENV}" >> $GITHUB_OUTPUT
+        env:
+          INPUT_ENV: ${{ matrix.environment }}
+
+      - name: Checkout ${{ env.MAIN_BRANCH }}
         uses: actions/checkout@v4
+        with:
+          path: ${{ env.MAIN_BRANCH }}
+
+      - name: Checkout ${{ env.ENV_BRANCH }}
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.ENV_BRANCH }}
+          ref: ${{ steps.precheck.outputs.base_ref_name }}
 
       - name: Config Server
         uses: majksa-actions/deployment-config@v1
         with:
-          source: ./input
-          target: ./output
-          environment: prod
+          source: ${{ env.MAIN_BRANCH }}
+          target: ${{ env.ENV_BRANCH }}
+          environment: ${{ matrix.environment }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          title: "chore(target): update target/ on ${{ github.ref_name }}"
-          commit-message: "chore(target): update target/"
-          body: "Updated target/ built distributable files"
-          branch: update-target--${{ github.ref_name }}
+          title: format('Update {0} environment branch', steps.precheck.outputs.base_ref_name)
+          commit-message: "chore: update environment branch data"
+          body: "Updated manifest file"
+          base: ${{ steps.precheck.outputs.base_ref_name }}
+          branch: update/${{ steps.precheck.outputs.base_ref_name }}
+          path: ${{ env.ENV_BRANCH }}
           delete-branch: true
           labels: bot,dist
