@@ -19,8 +19,8 @@ jobs:
       - name: Config Server
         uses: majksa-actions/deployment-config@v1
         with:
-          source: ./source
-          target: ./target
+          source: ./input
+          target: ./output
           environment: prod
 
       - name: Create Pull Request
